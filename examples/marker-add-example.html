@@ -3,11 +3,12 @@
   <head>
     <script src="../bower_components/angular/angular.min.js"></script>
     <script src="../bower_components/leaflet/dist/leaflet.js"></script>
-    <script src="../dist/angular-leaflet-directive.min.js"></script>
+	<script src="../dist/MovingMarker.js"></script>
+    <script src="../dist/angular-leaflet-directive.js"></script>
     <link rel="stylesheet" href="../bower_components/leaflet/dist/leaflet.css" />
     <script>
         var app = angular.module("demoapp", ["leaflet-directive"]);
-        app.controller('DemoController', [ '$scope', function($scope) {
+        app.controller('DemoController', [ '$scope', 'leafletData', function($scope, leafletData) {
             angular.extend($scope, {
                 london: {
                     lat: 51.505,
@@ -16,18 +17,40 @@
                 },
                 events: {}
             });
+			
+            $scope.markers = {}
 
-            $scope.markers = new Array();
-
-            $scope.$on("leafletDirectiveMap.click", function(event, args){
+            /*$scope.$on("leafletDirectiveMap.click", function(event, args){
                 var leafEvent = args.leafletEvent;
 
                 $scope.markers.push({
+					nodes: [leafEvent.latlng.lat, leafEvent.latlng.lng]],
+					durations: [],
                     lat: leafEvent.latlng.lat,
                     lng: leafEvent.latlng.lng,
                     message: "My Added Marker"
                 });
-            });
+            });*/
+			
+			$scope.doMarker = function() {
+				$scope.markers["cfgdfsgdfsgfdgdfgt"] = {
+					nodes: [[51.28446731707717,1.0756301879882812],[51.29327051233329,1.0907363891601562],[51.29627609493991,1.0986328125],[51.30056944306292,1.121978759765625]],
+					durations: [15000, 3000, 15000],
+					message: "My Added Marker",
+					lat: 51.28446731707717,
+					lng: 1.0756301879882812,
+				};
+				console.log("BOOM");
+				console.log($scope.markers);
+			}
+			
+			$scope.startMarker = function() {
+				leafletData.markerStart("cfgdfsgdfsgfdgdfgt");
+			}
+			
+			$scope.stopMarker = function() {
+				leafletData.markerStop("cfgdfsgdfsgfdgdfgt");
+			}
         } ]);
     </script>
   </head>
@@ -35,5 +58,9 @@
         <h3>Click on the map to add a marker</h3>
       <leaflet center="london" markers="markers" event-broadcast="events" height="480px" width="640px">
       </leaflet>
+	 
+	 <button ng-click="doMarker()">BOOM</button> 
+	 <button ng-click="startMarker()">Start Marker</button> 
+	 <button ng-click="stopMarker()">Stop Marker</button> 
   </body>
 </html>

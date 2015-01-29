@@ -44,6 +44,48 @@ angular.module("leaflet-directive").service('leafletData', function ($log, $q, l
         return defer.promise;
     };
 
+    this.startMarker = function(markerId) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].start();
+        })
+    }
+
+    this.stopMarker = function(markerId) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].stop();
+        })
+    }
+
+    this.pauseMarker = function(markerId) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].pause();
+        })
+    }
+
+    this.resumeMarker = function(markerId) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].resume();
+        })
+    }
+
+    this.addNodeToMarker = function(node, duration) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].addLatLng(node, duration);
+        })
+    }
+
+    this.addStationToMarker = function(index, duration) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].addStation(index, duration);
+        })
+    }
+
+    this.moveToPositionMarker = function(latlng, duration) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].moveTo(latlng, duration);
+        })
+    }
+
     this.setMarkers = function(leafletMarkers, scopeId) {
         var defer = getUnresolvedDefer(markers, scopeId);
         defer.resolve(leafletMarkers);

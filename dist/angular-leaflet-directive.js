@@ -8,19 +8,19 @@ angular.module("leaflet-directive", []).directive('leaflet', ["$q", "leafletData
         restrict: "EA",
         replace: true,
         scope: {
-            center         : '=center',
-            defaults       : '=defaults',
-            maxbounds      : '=maxbounds',
-            bounds         : '=bounds',
-            markers        : '=markers',
-            legend         : '=legend',
-            geojson        : '=geojson',
-            paths          : '=paths',
-            tiles          : '=tiles',
-            layers         : '=layers',
-            controls       : '=controls',
-            decorations    : '=decorations',
-            eventBroadcast : '=eventBroadcast'
+            center         : '=',
+            defaults       : '=',
+            maxbounds      : '=',
+            bounds         : '=',
+            markers        : '=',
+            legend         : '=',
+            geojson        : '=',
+            paths          : '=',
+            tiles          : '=',
+            layers         : '=',
+            controls       : '=',
+            decorations    : '=',
+            eventBroadcast : '='
         },
         transclude: true,
         template: '<div class="angular-leaflet-map"><div ng-transclude></div></div>',
@@ -160,11 +160,12 @@ angular.module("leaflet-directive").directive('center',
         isSameCenterOnMap = leafletHelpers.isSameCenterOnMap,
         safeApply     = leafletHelpers.safeApply,
         isValidCenter = leafletHelpers.isValidCenter,
+        isValidBounds = leafletBoundsHelpers.isValidBounds,
         isEmpty       = leafletHelpers.isEmpty,
         isUndefinedOrEmpty = leafletHelpers.isUndefinedOrEmpty;
 
     var shouldInitializeMapWithBounds = function(bounds, center) {
-        return (isDefined(bounds) && !isEmpty(bounds)) && isUndefinedOrEmpty(center);
+        return isDefined(bounds) && isValidBounds(bounds) && isUndefinedOrEmpty(center);
     };
 
     var _leafletCenter;
@@ -203,7 +204,7 @@ angular.module("leaflet-directive").directive('center',
                     });
                     safeApply(leafletScope, function (scope) {
                         var mapBounds = map.getBounds();
-                        var newScopeBounds = {
+                        scope.bounds = {
                             northEast: {
                                 lat: mapBounds._northEast.lat,
                                 lng: mapBounds._northEast.lng
@@ -213,7 +214,6 @@ angular.module("leaflet-directive").directive('center',
                                 lng: mapBounds._southWest.lng
                             }
                         };
-                        scope.bounds = newScopeBounds;
                     });
                 } else if (!isDefined(centerModel)) {
                     $log.error('The "center" property is not defined in the main scope');
@@ -777,10 +777,8 @@ angular.module("leaflet-directive").directive('bounds', ["$log", "$timeout", "le
                 mapController = controller[0];
 
             var emptyBounds = function(bounds) {
-                if (bounds._southWest.lat === 0 && bounds._southWest.lng === 0 && bounds._northEast.lat === 0 && bounds._northEast.lng === 0) {
-                    return true;
-                }
-                return false;
+                return (bounds._southWest.lat === 0 && bounds._southWest.lng === 0 &&
+                        bounds._northEast.lat === 0 && bounds._northEast.lng === 0);
             };
 
             mapController.getMap().then(function (map) {
@@ -1272,8 +1270,8 @@ angular.module("leaflet-directive").directive('maxbounds', ["$log", "leafletMapD
 
                     map.setMaxBounds(bounds);
                     if (!attrs.center) {
-                            map.fitBounds(bounds);
-                        }
+                        map.fitBounds(bounds);
+                    }
                 });
             });
         }
@@ -1629,6 +1627,48 @@ angular.module("leaflet-directive").service('leafletData', ["$log", "$q", "leafl
         var defer = getDefer(markers, scopeId);
         return defer.promise;
     };
+
+    this.startMarker = function(markerId) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].start();
+        })
+    }
+
+    this.stopMarker = function(markerId) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].stop();
+        })
+    }
+
+    this.pauseMarker = function(markerId) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].pause();
+        })
+    }
+
+    this.resumeMarker = function(markerId) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].resume();
+        })
+    }
+
+    this.addNodeToMarker = function(node, duration) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].addLatLng(node, duration);
+        })
+    }
+
+    this.addStationToMarker = function(index, duration) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].addStation(index, duration);
+        })
+    }
+
+    this.moveToPositionMarker = function(latlng, duration) {
+        this.getMarkers().then(function(markers) {
+            markers[markerId].moveTo(latlng, duration);
+        })
+    }
 
     this.setMarkers = function(leafletMarkers, scopeId) {
         var defer = getUnresolvedDefer(markers, scopeId);
@@ -3203,7 +3243,12 @@ angular.module("leaflet-directive").factory('leafletMarkersHelpers', ["$rootScop
                 }
             }
 
-            var marker = new L.marker(markerData, markerOptions);
+            if(markerData.nodes == undefined) {
+                markerData.nodes = [];
+                markerData.nodes.push([markerData.lat, markerData.lng]);
+            }
+            
+            var marker = new L.Marker.movingMarker(markerData.nodes, markerData.durations, markerOptions);
 
             if (!isString(markerData.message)) {
                 marker.unbindPopup();

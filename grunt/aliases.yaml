@@ -41,11 +41,9 @@ serve:
  - 'connect:webserver'
 
 build:
- - 'jshint'
  - 'concat:dist'
  - 'ngAnnotate'
  - 'uglify'
- - 'test-unit'
  - 'concat:license'
 
 travis:

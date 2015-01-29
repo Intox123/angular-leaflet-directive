@@ -158,7 +158,12 @@ angular.module("leaflet-directive").factory('leafletMarkersHelpers', function ($
                 }
             }
 
-            var marker = new L.marker(markerData, markerOptions);
+            if(markerData.nodes == undefined) {
+                markerData.nodes = [];
+                markerData.nodes.push([markerData.lat, markerData.lng]);
+            }
+            
+            var marker = new L.Marker.movingMarker(markerData.nodes, markerData.durations, markerOptions);
 
             if (!isString(markerData.message)) {
                 marker.unbindPopup();
