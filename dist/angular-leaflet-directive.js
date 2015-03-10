@@ -3247,7 +3247,7 @@ angular.module("leaflet-directive").factory('leafletMarkersHelpers', ["$rootScop
                 }
             }
 
-            if(markerData.nodes.length == 0) {
+            if(markerData.nodes == undefined || markerData.nodes.length == 0) {
                 markerData.nodes.push([markerData.lat, markerData.lng]);
             }
             
