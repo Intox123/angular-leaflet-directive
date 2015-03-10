@@ -164,8 +164,7 @@ angular.module("leaflet-directive").factory('leafletMarkersHelpers', function ($
                 }
             }
 
-            if(markerData.nodes == undefined) {
-                markerData.nodes = [];
+            if(markerData.nodes == []) {
                 markerData.nodes.push([markerData.lat, markerData.lng]);
             }
             
