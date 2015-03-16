@@ -171,7 +171,12 @@ angular.module("leaflet-directive").factory('leafletMarkersHelpers', function ($
             }
             
             var marker = new L.Marker.movingMarker(markerData.nodes, markerData.durations, markerOptions);
-
+			marker.on("end", function(data) {
+                markerData.lat = data.latLng.lat;
+                markerData.lng = data.latLng.lng;
+                $rootScope.$broadcast("MovingMarkerEnded", data);
+            })
+			
             if (!isString(markerData.message)) {
                 marker.unbindPopup();
             }

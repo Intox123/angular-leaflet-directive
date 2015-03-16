@@ -167,7 +167,7 @@ L.Marker.MovingMarker = L.Marker.extend({
                     // place the marker at the end, else it would be at 
                     // the last position
                     this.setLatLng(this._latlngs[this._latlngs.length-1]);
-                    this.stop(elapsedTime);
+                    this.stop(elapsedTime, this._latlngs[this._latlngs.length-1]);
                     return null;
                 }
             }
@@ -237,7 +237,7 @@ L.Marker.MovingMarker = L.Marker.extend({
             + (this._pauseStartTime - this._startTime), true);
     },
 
-    stop: function(elapsedTime) {
+    stop: function(elapsedTime, latLng) {
         if (this.isEnded()) {
             return;
         }
@@ -253,7 +253,7 @@ L.Marker.MovingMarker = L.Marker.extend({
         }
         
         this._state = L.Marker.MovingMarker.endedState;
-        this.fire('end', {elapsedTime: elapsedTime});
+        this.fire('end', {elapsedTime: elapsedTime, latLng: latLng});
     }
 });
 
