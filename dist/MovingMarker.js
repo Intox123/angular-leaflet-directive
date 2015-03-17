@@ -253,7 +253,7 @@ L.Marker.MovingMarker = L.Marker.extend({
         }
         
         this._state = L.Marker.MovingMarker.endedState;
-        this.fire('end', {elapsedTime: elapsedTime, latLng: latLng});
+        this.fire('end', {elapsedTime: elapsedTime, latLng: latLng, headcode: this.options.headcode});
     }
 });
 
